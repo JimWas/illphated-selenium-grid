@@ -1,10 +1,8 @@
-# Use official Python slim image
 FROM python:3.11-slim
 
 # Install dependencies for Chrome
 RUN apt-get update && apt-get install -y \
     wget \
-    unzip \
     gnupg \
     fonts-liberation \
     libx11-xcb1 \
@@ -29,15 +27,17 @@ RUN apt-get update && apt-get install -y \
 
 # Install Chrome
 RUN wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get update && apt-get install -y /tmp/chrome.deb && \
+    apt-get install -y /tmp/chrome.deb && \
     rm /tmp/chrome.deb
 
-# Install Python Selenium
+# Install Selenium
 RUN pip install --no-cache-dir selenium
 
-# Copy script
+# Set working directory
 WORKDIR /app
+
+# Copy our script
 COPY load_illphated.py /app/
 
-# Run the script
+# Run script when container starts
 CMD ["python", "load_illphated.py"]

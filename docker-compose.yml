@@ -18,7 +18,7 @@ services:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_SESSION_TIMEOUT=900  # 15 min
+      - SE_NODE_SESSION_TIMEOUT=900  # 15 minutes
 
   video:
     image: selenium/video:latest
@@ -29,7 +29,7 @@ services:
       - FILE_NAME=illphated-session.mp4
     volumes:
       - ./videos:/videos
-    stop_grace_period: 10s # Let FFmpeg finish writing file
+    stop_grace_period: 10s
 
   test-runner:
     build: .
@@ -37,3 +37,11 @@ services:
       - selenium-hub
     volumes:
       - .:/tests
+    command: >
+      sh -c "
+        echo 'Waiting for Selenium Hub...' &&
+        until nc -z selenium-hub 4444; do sleep 1; done &&
+        echo 'Hub is ready! Running script...' &&
+        python test_script.py
+      "
+

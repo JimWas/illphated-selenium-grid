@@ -1,9 +1,10 @@
 FROM python:3.11-slim
 
-# Install dependencies for Chrome
+# Install Chrome dependencies & Google repo key
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
+    apt-transport-https \
     fonts-liberation \
     libx11-xcb1 \
     libxcomposite1 \
@@ -21,23 +22,27 @@ RUN apt-get update && apt-get install -y \
     libgbm1 \
     libgtk-3-0 \
     libxss1 \
-    xdg-utils \
+    libvulkan1 \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Chrome
-RUN wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y /tmp/chrome.deb && \
-    rm /tmp/chrome.deb
+# Add Google’s official signing key & repo for Chrome
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-chrome.gpg && \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
+    > /etc/apt/sources.list.d/google-chrome.list
+
+# Install Chrome stable
+RUN apt-get update && apt-get install -y google-chrome-stable && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Selenium
 RUN pip install --no-cache-dir selenium
 
-# Set working directory
+# Set workdir
 WORKDIR /app
 
-# Copy our script
+# Copy script
 COPY load_illphated.py /app/
 
-# Run script when container starts
+# Run script
 CMD ["python", "load_illphated.py"]

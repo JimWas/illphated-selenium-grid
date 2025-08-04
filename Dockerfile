@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Add Google’s official signing key & repo for Chrome
+# Add Google's signing key & repo
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-chrome.gpg && \
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
     > /etc/apt/sources.list.d/google-chrome.list
@@ -38,11 +38,7 @@ RUN apt-get update && apt-get install -y google-chrome-stable && \
 # Install Selenium
 RUN pip install --no-cache-dir selenium
 
-# Set workdir
 WORKDIR /app
-
-# Copy script
 COPY load_illphated.py /app/
 
-# Run script
 CMD ["python", "load_illphated.py"]
